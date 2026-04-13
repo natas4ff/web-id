@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ID Catalog — ID Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #08090d;
+      --surface: #0f1117;
+      --card: #13151f;
+      --border: #1e2133;
+      --accent: #00e5ff;
+      --accent2: #7b5ef8;
+      --accent3: #ff4d6d;
+      --gold: #ffc107;
+      --text: #e8eaf6;
+      --muted: #5c607a;
+      --font-head: 'Syne', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-head);
+      min-height: 100vh; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: .4;
+    }
+    .orb { position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0; }
+    .orb-1 { width: 500px; height: 500px; background: rgba(0,229,255,.05); top: -100px; right: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(123,94,248,.06); bottom: 0; left: -100px; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 3rem;
+      background: rgba(8,9,13,.85); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
+    .nav-logo {
+      font-size: 1.3rem; font-weight: 800; letter-spacing: -1px; white-space: nowrap;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-decoration: none;
+    }
+    .nav-search-wrap {
+      flex: 1; max-width: 480px;
+      position: relative; display: flex; align-items: center;
+    }
+    .nav-search-wrap input {
+      width: 100%;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+      padding: .6rem 1rem .6rem 2.6rem; color: var(--text);
+      font-family: var(--font-mono); font-size: .85rem; outline: none;
+      transition: border-color .2s;
+    }
+    .nav-search-wrap input:focus { border-color: var(--accent); }
+    .nav-search-wrap input::placeholder { color: var(--muted); }
+    .search-icon { position: absolute; left: .85rem; color: var(--muted); font-size: .9rem; pointer-events: none; }
+    .nav-back {
+      color: var(--muted); text-decoration: none; font-size: .85rem; font-weight: 600;
+      transition: color .2s; white-space: nowrap;
+    }
+    .nav-back:hover { color: var(--text); }
+
+    /* ── HEADER ── */
+    .page-header {
+      position: relative; z-index: 1;
+      padding: 7rem 3rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-header-inner { max-width: 1300px; margin: 0 auto; }
+    .page-label {
+      font-size: .7rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent); font-weight: 700; margin-bottom: .8rem;
+    }
+    .page-title {
+      font-size: clamp(1.8rem, 4vw, 3.2rem);
+      font-weight: 800; letter-spacing: -1.5px; margin-bottom: .5rem;
+    }
+    .page-title span {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .page-sub { color: var(--muted); font-size: .9rem; }
+
+    /* ── FILTER BAR ── */
+    .filter-bar {
+      position: relative; z-index: 1;
+      padding: 1.2rem 3rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; gap: .6rem; flex-wrap: wrap; align-items: center;
+      background: rgba(8,9,13,.6); backdrop-filter: blur(8px);
+      max-width: 100%;
+      overflow-x: auto;
+    }
+    .filter-label { font-size: .72rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 700; white-space: nowrap; margin-right: .4rem; }
+    .filter-btn {
+      background: var(--card); border: 1px solid var(--border); color: var(--muted);
+      padding: .4rem 1rem; border-radius: 999px; cursor: pointer;
+      font-family: var(--font-head); font-size: .78rem; font-weight: 700;
+      transition: all .18s; white-space: nowrap;
+    }
+    .filter-btn:hover { border-color: var(--accent); color: var(--text); }
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
+    .filter-sep { width: 1px; height: 24px; background: var(--border); margin: 0 .3rem; }
+
+    /* ── SORT & COUNT ── */
+    .toolbar {
+      position: relative; z-index: 1;
+      padding: 1rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: .8rem;
+      max-width: 100%;
+    }
+    .result-info { font-size: .82rem; color: var(--muted); font-family: var(--font-mono); }
+    .result-info span { color: var(--text); font-weight: 600; }
+    .dup-legend {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .75rem; color: var(--muted); font-family: var(--font-mono);
+    }
+    .dup-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent3); display: inline-block; }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      position: relative; z-index: 1;
+      max-width: 1300px; margin: 0 auto; padding: 2rem 3rem 4rem;
+    }
+
+    /* ── LOADING ── */
+    .loader {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 300px; gap: 1rem;
+    }
+    .spinner {
+      width: 40px; height: 40px; border-radius: 50%;
+      border: 3px solid var(--border); border-top-color: var(--accent);
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { font-size: .85rem; color: var(--muted); font-family: var(--font-mono); }
+
+    /* ── SCORE GROUP ── */
+    .score-group { margin-bottom: 3.5rem; }
+    .group-header {
+      display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem;
+      padding-bottom: .8rem; border-bottom: 1px solid var(--border);
+    }
+    .group-score-badge {
+      font-size: 1.5rem; font-weight: 800;
+      font-family: var(--font-mono); letter-spacing: -1px;
+    }
+    .group-tier-pill {
+      font-size: .65rem; letter-spacing: 2px; text-transform: uppercase;
+      font-weight: 700; padding: .25rem .7rem; border-radius: 999px; border: 1px solid;
+    }
+    .group-count { font-size: .78rem; color: var(--muted); font-family: var(--font-mono); margin-left: auto; }
+    .group-count span { color: var(--text); }
+
+    /* ── ID GRID ── */
+    .id-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: .6rem;
+    }
+    .id-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: .9rem 1rem;
+      font-family: var(--font-mono); font-size: .92rem; font-weight: 500;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: border-color .18s, background .18s, transform .18s;
+      cursor: default; position: relative; overflow: hidden;
+      animation: fadeIn .3s ease both;
+    }
+    .id-card::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: var(--c, var(--accent)); opacity: .5;
+    }
+    .id-card:hover { border-color: rgba(0,229,255,.25); background: #161825; transform: translateX(2px); }
+    .id-card.is-dup { border-color: rgba(255,77,109,.2); }
+    .id-card.is-dup::before { background: var(--accent3); opacity: .8; }
+    .id-num { letter-spacing: .5px; }
+    .dup-badge {
+      font-size: .62rem; letter-spacing: 1.5px; text-transform: uppercase;
+      background: rgba(255,77,109,.15); color: var(--accent3);
+      border: 1px solid rgba(255,77,109,.3); border-radius: 4px; padding: .15rem .4rem;
+      font-family: var(--font-head); font-weight: 700;
+    }
+
+    @keyframes fadeIn { from { opacity:0; transform: scale(.97); } to { opacity:1; transform: scale(1); } }
+
+    /* ── EMPTY ── */
+    .empty {
+      text-align: center; padding: 4rem 2rem; color: var(--muted);
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: .4rem; }
+    .empty-sub { font-size: .85rem; }
+
+    /* ── PAGINATION ── */
+    .pagination {
+      display: flex; gap: .5rem; justify-content: center;
+      margin-top: 1.5rem; flex-wrap: wrap;
+    }
+    .page-num {
+      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; border: 1px solid var(--border); background: var(--card);
+      font-size: .8rem; font-family: var(--font-mono); cursor: pointer;
+      transition: all .15s; color: var(--muted);
+    }
+    .page-num:hover { border-color: var(--accent); color: var(--text); }
+    .page-num.active { background: var(--accent); border-color: var(--accent); color: #000; font-weight: 700; }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width: 768px) {
+      nav { padding: .9rem 1rem; }
+      .page-header { padding: 6rem 1.5rem 2rem; }
+      .filter-bar { padding: 1rem 1.5rem; }
+      .toolbar { padding: .8rem 1.5rem; }
+      .main { padding: 1.5rem 1.5rem 4rem; }
+      .id-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">ID·STORE</a>
+    <div class="nav-search-wrap">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="globalSearch" placeholder="Cari nomor dari semua kategori..." autocomplete="off" />
+    </div>
+    <a href="index.html" class="nav-back">← Kembali</a>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-label">Katalog Lengkap</div>
+      <h1 class="page-title">Semua <span>ID</span> Tersedia</h1>
+      <p class="page-sub" id="headerSub">Memuat data...</p>
+    </div>
+  </div>
+
+  <!-- FILTER -->
+  <div class="filter-bar" id="filterBar">
+    <span class="filter-label">Filter Score</span>
+    <button class="filter-btn active" data-score="all" onclick="setFilter('all')">Semua</button>
+    <div class="filter-sep"></div>
+    <button class="filter-btn" data-score="10" onclick="setFilter('10')">Score 10</button>
+    <button class="filter-btn" data-score="20" onclick="setFilter('20')">Score 20</button>
+    <button class="filter-btn" data-score="30" onclick="setFilter('30')">Score 30</button>
+    <button class="filter-btn" data-score="45" onclick="setFilter('45')">Score 45</button>
+    <button class="filter-btn" data-score="50" onclick="setFilter('50')">Score 50</button>
+    <button class="filter-btn" data-score="53" onclick="setFilter('53')">Score 53</button>
+    <button class="filter-btn" data-score="60" onclick="setFilter('60')">Score 60</button>
+    <div class="filter-sep"></div>
+    <button class="filter-btn" data-score="dup" onclick="setFilter('dup')">⚠ Duplikat</button>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="result-info" id="resultInfo">Memuat...</div>
+    <div class="dup-legend"><span class="dup-dot"></span> Nomor muncul di beberapa score</div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="mainContent">
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+      <div class="loader-text">Mengambil data dari GitHub...</div>
+    </div>
+  </div>
+
+  <script>
+    const SOURCES = [
+      { score: '10',  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/10.json',  color: '#ffc107', tier: 'C', tierClass: 'tier-c' },
+      { score: '20',  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/20.json',  color: '#ffc107', tier: 'C', tierClass: 'tier-c' },
+      { score: '30',  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/30.json',  color: '#ff4d6d', tier: 'B', tierClass: 'tier-b' },
+      { score: '45',  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/45.json',  color: '#7b5ef8', tier: 'A', tierClass: 'tier-a' },
+      { score: '50',  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/50.json',  color: '#7b5ef8', tier: 'A', tierClass: 'tier-a' },
+      { score: '53',  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/53.json',  color: '#00e5ff', tier: 'S', tierClass: 'tier-s' },
+      { score: '60',  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/60.json',  color: '#00e5ff', tier: 'S', tierClass: 'tier-s' },
+    ];
+
+    const TIER_COLORS = {
+      'tier-s': { bg: 'rgba(0,229,255,.1)', border: 'rgba(0,229,255,.3)', text: '#00e5ff' },
+      'tier-a': { bg: 'rgba(123,94,248,.1)', border: 'rgba(123,94,248,.3)', text: '#7b5ef8' },
+      'tier-b': { bg: 'rgba(255,77,109,.1)', border: 'rgba(255,77,109,.3)', text: '#ff4d6d' },
+      'tier-c': { bg: 'rgba(255,193,7,.1)',  border: 'rgba(255,193,7,.3)',  text: '#ffc107' },
+    };
+
+    let allData = {};     // { score: [nums] }
+    let dupMap  = {};     // { num: [scores] }
+    let activeFilter = 'all';
+    let searchQuery = '';
+
+    const PAGE_SIZE = 300;
+    let currentPage = {};
+
+    async function fetchAll() {
+      const promises = SOURCES.map(async s => {
+        const r = await fetch(s.url);
+        const t = await r.text();
+        const ids = t.trim().split('\n').map(l => l.trim()).filter(Boolean);
+        allData[s.score] = ids;
+      });
+      await Promise.all(promises);
+
+      // Build dup map
+      const freq = {};
+      SOURCES.forEach(s => {
+        allData[s.score].forEach(n => {
+          if (!freq[n]) freq[n] = [];
+          freq[n].push(s.score);
+        });
+      });
+      Object.entries(freq).forEach(([n, scores]) => {
+        if (scores.length > 1) dupMap[n] = scores;
+      });
+
+      // Init page
+      SOURCES.forEach(s => currentPage[s.score] = 1);
+
+      // Check URL param
+      const params = new URLSearchParams(window.location.search);
+      const sc = params.get('score');
+      if (sc) setFilter(sc);
+      else render();
+    }
+
+    function setFilter(f) {
+      activeFilter = f;
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.score === f);
+      });
+      searchQuery = '';
+      document.getElementById('globalSearch').value = '';
+      SOURCES.forEach(s => currentPage[s.score] = 1);
+      render();
+    }
+
+    document.getElementById('globalSearch').addEventListener('input', function() {
+      searchQuery = this.value.trim();
+      SOURCES.forEach(s => currentPage[s.score] = 1);
+      render();
+    });
+
+    function getFiltered() {
+      // Returns { score: [nums] } after applying filter + search
+      const result = {};
+      const scores = activeFilter === 'all' ? SOURCES.map(s => s.score)
+                   : activeFilter === 'dup' ? SOURCES.map(s => s.score)
+                   : [activeFilter];
+
+      scores.forEach(sc => {
+        let nums = allData[sc] || [];
+        if (activeFilter === 'dup') nums = nums.filter(n => dupMap[n]);
+        if (searchQuery.length >= 3) nums = nums.filter(n => n.includes(searchQuery));
+        if (nums.length) result[sc] = nums;
+      });
+      return result;
+    }
+
+    function render() {
+      const filtered = getFiltered();
+      const main = document.getElementById('mainContent');
+      let totalShown = 0;
+      Object.values(filtered).forEach(a => totalShown += a.length);
+
+      // Update header sub
+      const total = Object.values(allData).reduce((s, a) => s + a.length, 0);
+      document.getElementById('headerSub').textContent =
+        `${total.toLocaleString('id-ID')} nomor total · ${Object.keys(dupMap).length} nomor duplikat terdeteksi`;
+
+      // Update toolbar
+      document.getElementById('resultInfo').innerHTML =
+        `Menampilkan <span>${totalShown.toLocaleString('id-ID')}</span> nomor`;
+
+      if (totalShown === 0) {
+        main.innerHTML = `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">Tidak ada hasil</div><div class="empty-sub">Coba ubah filter atau kata kunci pencarian.</div></div>`;
+        return;
+      }
+
+      main.innerHTML = '';
+
+      const sortedScores = Object.keys(filtered).sort((a, b) => +a - +b);
+
+      sortedScores.forEach(sc => {
+        const src = SOURCES.find(s => s.score === sc);
+        const nums = filtered[sc];
+        const tc = TIER_COLORS[src.tierClass];
+
+        const page = currentPage[sc] || 1;
+        const start = (page - 1) * PAGE_SIZE;
+        const pageNums = nums.slice(start, start + PAGE_SIZE);
+        const totalPages = Math.ceil(nums.length / PAGE_SIZE);
+
+        const group = document.createElement('div');
+        group.className = 'score-group';
+        group.id = `group-${sc}`;
+
+        // Header
+        group.innerHTML = `
+          <div class="group-header">
+            <span class="group-score-badge" style="color:${src.color}">SCORE ${sc}</span>
+            <span class="group-tier-pill" style="background:${tc.bg};border-color:${tc.border};color:${tc.text}">TIER ${src.tier}</span>
+            <span class="group-count">Tampil <span>${pageNums.length.toLocaleString('id-ID')}</span> / <span>${nums.length.toLocaleString('id-ID')}</span></span>
+          </div>
+        `;
+
+        // Grid
+        const grid = document.createElement('div');
+        grid.className = 'id-grid';
+
+        pageNums.forEach((num, idx) => {
+          const isDup = !!dupMap[num];
+          const card = document.createElement('div');
+          card.className = 'id-card' + (isDup ? ' is-dup' : '');
+          card.style.setProperty('--c', src.color);
+          card.style.animationDelay = `${Math.min(idx * 10, 300)}ms`;
+
+          let numDisplay = num;
+          if (searchQuery.length >= 3) {
+            numDisplay = num.replace(new RegExp(`(${searchQuery})`, 'g'), `<mark style="background:rgba(0,229,255,.25);color:var(--accent);border-radius:2px">$1</mark>`);
+          }
+
+          card.innerHTML = `
+            <span class="id-num">${numDisplay}</span>
+            ${isDup ? `<span class="dup-badge" title="Muncul di score: ${dupMap[num].join(', ')}">DUP</span>` : ''}
+          `;
+          grid.appendChild(card);
+        });
+
+        group.appendChild(grid);
+
+        // Pagination
+        if (totalPages > 1) {
+          const pg = document.createElement('div');
+          pg.className = 'pagination';
+          const maxShow = 7;
+          let start = Math.max(1, page - 3), end = Math.min(totalPages, start + maxShow - 1);
+          if (end - start < maxShow - 1) start = Math.max(1, end - maxShow + 1);
+
+          if (start > 1) {
+            const b = document.createElement('div'); b.className = 'page-num'; b.textContent = '1';
+            b.onclick = () => goPage(sc, 1); pg.appendChild(b);
+            if (start > 2) { const e = document.createElement('div'); e.className = 'page-num'; e.textContent = '…'; e.style.cursor='default'; pg.appendChild(e); }
+          }
+          for (let i = start; i <= end; i++) {
+            const b = document.createElement('div');
+            b.className = 'page-num' + (i === page ? ' active' : '');
+            b.textContent = i; const ii = i;
+            b.onclick = () => goPage(sc, ii); pg.appendChild(b);
+          }
+          if (end < totalPages) {
+            if (end < totalPages - 1) { const e = document.createElement('div'); e.className = 'page-num'; e.textContent = '…'; e.style.cursor='default'; pg.appendChild(e); }
+            const b = document.createElement('div'); b.className = 'page-num'; b.textContent = totalPages;
+            b.onclick = () => goPage(sc, totalPages); pg.appendChild(b);
+          }
+          group.appendChild(pg);
+        }
+
+        main.appendChild(group);
+      });
+    }
+
+    function goPage(sc, page) {
+      currentPage[sc] = page;
+      render();
+      const el = document.getElementById(`group-${sc}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    fetchAll().catch(e => {
+      document.getElementById('mainContent').innerHTML =
+        `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-title">Gagal memuat data</div><div class="empty-sub">${e.message}</div></div>`;
+    });
+  </script>
+</body>
+</html>
