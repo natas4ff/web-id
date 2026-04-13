@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ID Store — Premium Number Shop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #08090d;
+      --surface: #0f1117;
+      --card: #13151f;
+      --border: #1e2133;
+      --accent: #00e5ff;
+      --accent2: #7b5ef8;
+      --accent3: #ff4d6d;
+      --text: #e8eaf6;
+      --muted: #5c607a;
+      --font-head: 'Syne', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-head);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 999; opacity: .4;
+    }
+
+    /* ── GLOW ORBS ── */
+    .orb {
+      position: fixed; border-radius: 50%;
+      filter: blur(100px); pointer-events: none; z-index: 0;
+    }
+    .orb-1 { width: 500px; height: 500px; background: rgba(0,229,255,.07); top: -150px; left: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: rgba(123,94,248,.08); bottom: 100px; right: -100px; }
+    .orb-3 { width: 300px; height: 300px; background: rgba(255,77,109,.06); top: 40%; left: 50%; transform: translateX(-50%); }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 3rem;
+      background: rgba(8,9,13,.8);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-size: 1.4rem; font-weight: 800; letter-spacing: -1px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 2rem; align-items: center; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: .9rem;
+      font-weight: 600; letter-spacing: .5px; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent); color: #000 !important;
+      padding: .5rem 1.4rem; border-radius: 999px;
+      font-weight: 700 !important; transition: opacity .2s !important;
+    }
+    .nav-cta:hover { opacity: .85; color: #000 !important; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 6rem 2rem 4rem;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.2);
+      color: var(--accent); padding: .4rem 1rem; border-radius: 999px;
+      font-size: .75rem; font-weight: 600; letter-spacing: 2px;
+      text-transform: uppercase; margin-bottom: 2rem;
+      animation: fadeUp .6s ease both;
+    }
+    .hero-badge::before { content: '●'; font-size: .5rem; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 800; line-height: 1; letter-spacing: -3px;
+      animation: fadeUp .7s .1s ease both;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 50%, var(--accent3) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero-sub {
+      margin-top: 1.5rem; max-width: 560px;
+      font-size: 1.1rem; color: var(--muted); line-height: 1.7;
+      font-weight: 400; animation: fadeUp .7s .2s ease both;
+    }
+
+    /* ── STAT BAR ── */
+    .stat-bar {
+      margin-top: 4rem;
+      display: flex; gap: 1px;
+      background: var(--border); border: 1px solid var(--border);
+      border-radius: 20px; overflow: hidden;
+      animation: fadeUp .7s .35s ease both;
+      max-width: 700px; width: 100%;
+    }
+    .stat-item {
+      flex: 1; background: var(--card);
+      padding: 1.6rem 1rem; text-align: center;
+    }
+    .stat-num {
+      font-size: 2rem; font-weight: 800;
+      font-family: var(--font-mono);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+      font-size: .72rem; color: var(--muted);
+      letter-spacing: 1.5px; text-transform: uppercase;
+      margin-top: .3rem; font-weight: 600;
+    }
+
+    .hero-actions {
+      display: flex; gap: 1rem; margin-top: 3rem; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp .7s .45s ease both;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #000; font-weight: 700; font-size: 1rem;
+      padding: .85rem 2.5rem; border-radius: 999px; text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 0 30px rgba(0,229,255,.25);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(0,229,255,.4); }
+    .btn-secondary {
+      background: transparent; color: var(--text); font-weight: 600; font-size: 1rem;
+      padding: .85rem 2.5rem; border-radius: 999px; text-decoration: none;
+      border: 1px solid var(--border); transition: border-color .2s, background .2s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); background: rgba(0,229,255,.05); }
+
+    /* ── SCORE CARDS SECTION ── */
+    .section {
+      position: relative; z-index: 1;
+      padding: 6rem 3rem;
+      max-width: 1300px; margin: 0 auto;
+    }
+    .section-label {
+      font-size: .72rem; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--accent); font-weight: 700; margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800; letter-spacing: -1.5px; margin-bottom: .8rem;
+    }
+    .section-sub { color: var(--muted); font-size: 1rem; line-height: 1.6; max-width: 480px; }
+
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem; margin-top: 3.5rem;
+    }
+    .score-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 1.8rem;
+      text-decoration: none; color: var(--text);
+      transition: transform .25s, border-color .25s, box-shadow .25s;
+      display: block; position: relative; overflow: hidden;
+    }
+    .score-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: var(--card-accent, linear-gradient(90deg, var(--accent), var(--accent2)));
+      opacity: 0; transition: opacity .25s;
+    }
+    .score-card:hover { transform: translateY(-4px); border-color: rgba(0,229,255,.3); box-shadow: 0 20px 60px rgba(0,0,0,.4); }
+    .score-card:hover::before { opacity: 1; }
+
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.2rem; }
+    .card-badge {
+      font-size: .7rem; letter-spacing: 2px; text-transform: uppercase;
+      font-weight: 700; padding: .3rem .8rem; border-radius: 999px;
+      border: 1px solid;
+    }
+    .card-badge.tier-s { background: rgba(0,229,255,.1); border-color: rgba(0,229,255,.3); color: var(--accent); }
+    .card-badge.tier-a { background: rgba(123,94,248,.1); border-color: rgba(123,94,248,.3); color: var(--accent2); }
+    .card-badge.tier-b { background: rgba(255,77,109,.1); border-color: rgba(255,77,109,.3); color: var(--accent3); }
+    .card-badge.tier-c { background: rgba(255,193,7,.1); border-color: rgba(255,193,7,.3); color: #ffc107; }
+
+    .card-score {
+      font-size: 2.8rem; font-weight: 800;
+      font-family: var(--font-mono); letter-spacing: -2px;
+    }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: .4rem; }
+    .card-count {
+      font-size: .82rem; color: var(--muted);
+      font-family: var(--font-mono);
+    }
+    .card-count span {
+      color: var(--text); font-weight: 600;
+    }
+    .card-arrow {
+      display: inline-flex; align-items: center; gap: .4rem;
+      margin-top: 1.4rem; font-size: .82rem; font-weight: 600;
+      color: var(--muted); transition: color .2s, gap .2s;
+    }
+    .score-card:hover .card-arrow { color: var(--accent); gap: .7rem; }
+
+    /* ── FEATURES ── */
+    .features { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem; margin-top: 3.5rem; }
+    .feature-item {
+      padding: 1.6rem; background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+    .feature-icon {
+      width: 44px; height: 44px; border-radius: 12px; display: flex;
+      align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 1rem;
+    }
+    .feature-title { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
+    .feature-desc { font-size: .82rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
+      color: var(--muted); font-size: .82rem;
+    }
+    footer strong {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px; background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 0 3rem;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:768px){
+      nav { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .section { padding: 4rem 1.5rem; }
+      .stat-bar { flex-direction: column; }
+      footer { padding: 2rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">ID·STORE</div>
+    <div class="nav-links">
+      <a href="#scores">Koleksi</a>
+      <a href="#features">Fitur</a>
+      <a href="id.html" class="nav-cta">Lihat Semua ID</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge"><span>Live</span> Stok Tersedia</div>
+    <h1>Nomor <span>Premium</span><br/>Pilihan Terbaik</h1>
+    <p class="hero-sub">Temukan ID nomor eksklusif dengan berbagai kategori score. Dari unik hingga premium — semua ada di sini.</p>
+
+    <!-- STATS: loaded via JS -->
+    <div class="stat-bar" id="statBar">
+      <div class="stat-item">
+        <div class="stat-num" id="totalAll">—</div>
+        <div class="stat-label">Total ID</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">7</div>
+        <div class="stat-label">Kategori</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="dupCount">—</div>
+        <div class="stat-label">Nomor Duplikat</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">24/7</div>
+        <div class="stat-label">Tersedia</div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="id.html" class="btn-primary">Jelajahi Semua ID →</a>
+      <a href="#scores" class="btn-secondary">Lihat Kategori</a>
+    </div>
+  </section>
+
+  <!-- SCORE SECTIONS -->
+  <div class="divider"></div>
+  <section class="section" id="scores">
+    <div class="section-label">Koleksi Nomor</div>
+    <h2 class="section-title">Pilih Berdasarkan Score</h2>
+    <p class="section-sub">Setiap kategori memiliki karakter unik. Semakin tinggi score, semakin eksklusif nomor tersebut.</p>
+
+    <div class="score-grid" id="scoreGrid">
+      <!-- generated by JS -->
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <div class="divider"></div>
+  <section class="section" id="features">
+    <div class="section-label">Mengapa Kami</div>
+    <h2 class="section-title">Fitur Unggulan</h2>
+
+    <div class="features">
+      <div class="feature-item">
+        <div class="feature-icon" style="background:rgba(0,229,255,.1)">🔍</div>
+        <div class="feature-title">Smart Search</div>
+        <div class="feature-desc">Cari nomor spesifik dari semua kategori sekaligus dalam hitungan detik.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:rgba(123,94,248,.1)">⚡</div>
+        <div class="feature-title">Live Stock</div>
+        <div class="feature-desc">Data stok diperbarui langsung dari sumber GitHub secara real-time.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:rgba(255,77,109,.1)">🎯</div>
+        <div class="feature-title">Deteksi Duplikat</div>
+        <div class="feature-desc">Sistem otomatis menandai nomor yang muncul di beberapa kategori score.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:rgba(255,193,7,.1)">🏆</div>
+        <div class="feature-title">Score Rating</div>
+        <div class="feature-desc">Tiering dari S hingga C membantu Anda menemukan level yang tepat.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div><strong>ID·STORE</strong> — Premium Number Shop</div>
+    <div>© 2025 · Semua hak dilindungi</div>
+  </footer>
+
+  <script>
+    const SOURCES = [
+      { score: 10,  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/10.json',  tier: 'tier-c', color: '#ffc107' },
+      { score: 20,  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/20.json',  tier: 'tier-c', color: '#ffc107' },
+      { score: 30,  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/30.json',  tier: 'tier-b', color: '#ff4d6d' },
+      { score: 45,  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/45.json',  tier: 'tier-a', color: '#7b5ef8' },
+      { score: 50,  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/50.json',  tier: 'tier-a', color: '#7b5ef8' },
+      { score: 53,  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/53.json',  tier: 'tier-s', color: '#00e5ff' },
+      { score: 60,  url: 'https://raw.githubusercontent.com/natas4ff/web-id/main/id/60.json',  tier: 'tier-s', color: '#00e5ff' },
+    ];
+
+    const TIER_LABEL = { 'tier-s': 'S — ULTRA', 'tier-a': 'A — PREMIUM', 'tier-b': 'B — RARE', 'tier-c': 'C — STANDARD' };
+
+    async function fetchIDs(url) {
+      try {
+        const r = await fetch(url);
+        const t = await r.text();
+        return t.trim().split('\n').map(l => l.trim()).filter(Boolean);
+      } catch { return []; }
+    }
+
+    async function init() {
+      const results = await Promise.all(SOURCES.map(s => fetchIDs(s.url)));
+
+      // Count totals & duplicates
+      const allNums = [];
+      const counts = [];
+      results.forEach(ids => { counts.push(ids.length); allNums.push(...ids); });
+      const total = allNums.length;
+      const freq = {};
+      allNums.forEach(n => freq[n] = (freq[n] || 0) + 1);
+      const dups = Object.values(freq).filter(v => v > 1).length;
+
+      // Update hero stats
+      document.getElementById('totalAll').textContent = total.toLocaleString('id-ID');
+      document.getElementById('dupCount').textContent = dups.toLocaleString('id-ID');
+
+      // Build score cards
+      const grid = document.getElementById('scoreGrid');
+      SOURCES.forEach((src, i) => {
+        const card = document.createElement('a');
+        card.href = `id.html?score=${src.score}`;
+        card.className = 'score-card';
+        card.style.setProperty('--card-accent', `linear-gradient(90deg, ${src.color}, transparent)`);
+        card.innerHTML = `
+          <div class="card-top">
+            <span class="card-badge ${src.tier}">${TIER_LABEL[src.tier]}</span>
+            <span class="card-score" style="color:${src.color}">${src.score}</span>
+          </div>
+          <div class="card-title">Score ${src.score} Collection</div>
+          <div class="card-count">Tersedia: <span>${counts[i].toLocaleString('id-ID')} nomor</span></div>
+          <div class="card-arrow">Lihat koleksi <span>→</span></div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
