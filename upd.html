@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Panel — ID Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080f;--card:#111320;--card2:#161929;--border:#1f2340;--border2:#252a4a;
+  --cyan:#00d4ff;--purple:#8b5cf6;--pink:#f43f76;--gold:#f59e0b;--green:#10b981;--red:#ef4444;
+  --text:#eef0ff;--muted:#636892;--font:'Plus Jakarta Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px)}
+.o1{width:400px;height:400px;background:radial-gradient(circle,rgba(0,212,255,.08),transparent 70%);top:-100px;left:-100px}
+.o2{width:350px;height:350px;background:radial-gradient(circle,rgba(139,92,246,.07),transparent 70%);bottom:0;right:-80px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;padding:0 16px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,8,15,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-size:.95rem;font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-tag{font-size:.62rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border-radius:99px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--gold)}
+.nav-back{color:var(--muted);text-decoration:none;font-size:.78rem;font-weight:700;transition:color .2s}
+.nav-back:hover{color:var(--text)}
+
+/* LAYOUT */
+.wrap{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:72px 16px 60px}
+
+/* SECTION CARD */
+.sec{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:20px;margin-bottom:16px;position:relative;overflow:hidden}
+.sec::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--sec-accent,linear-gradient(90deg,var(--cyan),var(--purple)))}
+.sec-title{font-size:.88rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.sec-sub{font-size:.72rem;color:var(--muted);line-height:1.5;margin-bottom:16px}
+
+/* FORM ELEMENTS */
+label{display:block;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px}
+input[type=text],input[type=password],textarea,select{
+  width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:10px;
+  padding:.65rem .85rem;color:var(--text);font-family:var(--mono);font-size:.82rem;outline:none;
+  transition:border-color .2s;-webkit-appearance:none;
+}
+input[type=text]:focus,input[type=password]:focus,textarea:focus,select:focus{border-color:var(--cyan);background:rgba(17,19,32,.8)}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+textarea{resize:vertical;min-height:100px;line-height:1.6}
+select{cursor:pointer}
+select option{background:var(--card)}
+.field{margin-bottom:14px}
+
+/* SCORE SELECT GRID */
+.score-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.score-pill{background:var(--card2);border:1px solid var(--border2);color:var(--muted);padding:.35rem .85rem;border-radius:99px;cursor:pointer;font-size:.75rem;font-weight:800;transition:all .15s;user-select:none}
+.score-pill:hover{border-color:var(--cyan);color:var(--text)}
+.score-pill.sel{background:var(--cyan);border-color:var(--cyan);color:#000}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:.65rem 1.4rem;border-radius:10px;font-size:.82rem;font-weight:800;cursor:pointer;border:none;transition:transform .15s,opacity .2s;font-family:var(--font)}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-cyan{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-red{background:var(--red);color:#fff}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}
+.btn-ghost:hover{color:var(--text);border-color:var(--cyan)}
+.btn-full{width:100%}
+.btn-sm{padding:.4rem .9rem;font-size:.72rem}
+
+/* TOKEN */
+.token-wrap{position:relative}
+.token-wrap input{padding-right:3rem}
+.token-eye{position:absolute;right:.7rem;top:50%;transform:translateY(-50%);color:var(--muted);cursor:pointer;font-size:.85rem;transition:color .2s}
+.token-eye:hover{color:var(--text)}
+.token-status{display:flex;align-items:center;gap:6px;font-size:.72rem;margin-top:6px}
+.ts-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.ts-dot.ok{background:var(--green)}
+.ts-dot.err{background:var(--red)}
+
+/* LOG */
+.log-wrap{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:12px;max-height:180px;overflow-y:auto;font-family:var(--mono);font-size:.72rem;line-height:1.7}
+.log-wrap::-webkit-scrollbar{width:4px}
+.log-wrap::-webkit-scrollbar-track{background:transparent}
+.log-wrap::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.log-entry{padding:2px 0;border-bottom:1px solid var(--border)}
+.log-entry:last-child{border-bottom:none}
+.log-time{color:var(--muted);margin-right:8px}
+.log-ok{color:var(--green)}
+.log-err{color:var(--red)}
+.log-info{color:var(--cyan)}
+
+/* ID LIST PREVIEW */
+.id-preview{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;max-height:120px;overflow-y:auto}
+.id-chip{background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:.2rem .55rem;font-family:var(--mono);font-size:.7rem;display:flex;align-items:center;gap:4px}
+.chip-del{color:var(--red);cursor:pointer;font-weight:900;line-height:1;transition:color .2s}
+.chip-del:hover{color:var(--pink)}
+
+/* SOLD SEARCH RESULT */
+.sell-result{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:12px;margin-top:10px;display:none}
+.sr-found{color:var(--green);font-size:.78rem;font-weight:800;margin-bottom:6px}
+.sr-notfound{color:var(--red);font-size:.78rem;font-weight:800}
+.sr-detail{font-size:.72rem;color:var(--muted);font-family:var(--mono)}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9998;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:10px 16px;font-size:.78rem;font-weight:700;display:flex;align-items:center;gap:8px;box-shadow:0 8px 32px rgba(0,0,0,.4);animation:slideUp .3s ease;pointer-events:auto;max-width:300px}
+.toast.ok{border-color:rgba(16,185,129,.3);color:var(--green)}
+.toast.err{border-color:rgba(239,68,68,.3);color:var(--red)}
+.toast.info{border-color:rgba(0,212,255,.3);color:var(--cyan)}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:16px 0}
+
+/* SPINNER INLINE */
+.sp-sm{width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;animation:spin .6s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<nav>
+  <div class="nav-logo">ID·STORE</div>
+  <span class="nav-tag">⚙ Admin Panel</span>
+  <a href="index.html" class="nav-back">← Store</a>
+</nav>
+
+<div class="wrap">
+
+  <!-- ── TOKEN SECTION ── -->
+  <div class="sec" style="--sec-accent:linear-gradient(90deg,var(--gold),var(--pink))">
+    <div class="sec-title">🔑 GitHub Token</div>
+    <div class="sec-sub">Simpan token GitHub Personal Access Token (PAT) dengan permission <b>repo</b> untuk menulis ke repository.</div>
+    <div class="field">
+      <label>Personal Access Token</label>
+      <div class="token-wrap">
+        <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxx" autocomplete="off"/>
+        <span class="token-eye" onclick="toggleToken()">👁</span>
+      </div>
+      <div class="token-status">
+        <div class="ts-dot" id="tsDot"></div>
+        <span id="tsLabel" style="color:var(--muted)">Belum disimpan</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>GitHub Repo (username/repo)</label>
+      <input type="text" id="repoInput" placeholder="natas4ff/web-id" value="natas4ff/web-id"/>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-cyan" onclick="saveToken()">💾 Simpan Token</button>
+      <button class="btn btn-ghost" onclick="testToken()">🔍 Test Koneksi</button>
+      <button class="btn btn-ghost btn-sm" onclick="clearToken()" style="color:var(--red)">🗑 Hapus</button>
+    </div>
+  </div>
+
+  <!-- ── TAMBAH ID ── -->
+  <div class="sec" style="--sec-accent:linear-gradient(90deg,var(--green),var(--cyan))">
+    <div class="sec-title">➕ Tambah ID Baru</div>
+    <div class="sec-sub">Masukkan ID baru (bisa lebih dari satu, pisahkan dengan enter/koma/spasi). Pilih kategori score terlebih dahulu.</div>
+
+    <div class="field">
+      <label>Pilih Score</label>
+      <div class="score-pills" id="addScorePills">
+        <div class="score-pill" data-v="10" onclick="selScore(this,'add')">10</div>
+        <div class="score-pill" data-v="20" onclick="selScore(this,'add')">20</div>
+        <div class="score-pill" data-v="30" onclick="selScore(this,'add')">30</div>
+        <div class="score-pill" data-v="45" onclick="selScore(this,'add')">45</div>
+        <div class="score-pill" data-v="50" onclick="selScore(this,'add')">50</div>
+        <div class="score-pill" data-v="53" onclick="selScore(this,'add')">53</div>
+        <div class="score-pill" data-v="60" onclick="selScore(this,'add')">60</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>ID Baru <span id="addCount" style="color:var(--cyan);font-size:.8rem"></span></label>
+      <textarea id="addInput" placeholder="15381234567&#10;15389876543&#10;15387654321&#10;(pisahkan dengan enter, koma, atau spasi)" oninput="parseAdd()"></textarea>
+      <div class="id-preview" id="addPreview"></div>
+    </div>
+
+    <button class="btn btn-green btn-full" id="btnAdd" onclick="addIDs()" disabled>
+      <span id="addBtnText">➕ Tambah ke GitHub</span>
+    </button>
+  </div>
+
+  <!-- ── MARK SOLD ── -->
+  <div class="sec" style="--sec-accent:linear-gradient(90deg,var(--red),var(--pink))">
+    <div class="sec-title">🔴 Tandai ID Terjual</div>
+    <div class="sec-sub">Masukkan ID yang sudah terjual. Sistem akan mencari di semua file score, memindahkan ke <b>sold.json</b>, dan menghapus dari file asal.</div>
+
+    <div class="field">
+      <label>ID yang Terjual <span id="soldCount" style="color:var(--pink);font-size:.8rem"></span></label>
+      <textarea id="soldInput" placeholder="15381115777&#10;15387773191&#10;(pisahkan dengan enter, koma, atau spasi)" oninput="parseSold()"></textarea>
+      <div class="id-preview" id="soldPreview"></div>
+    </div>
+
+    <div class="sell-result" id="sellResult"></div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+      <button class="btn btn-ghost" onclick="searchIDs()">
+        <span id="srchBtnText">🔍 Cari di Semua Score</span>
+      </button>
+      <button class="btn btn-red" id="btnSold" onclick="markSold()" disabled>
+        <span id="soldBtnText">🔴 Pindahkan ke Sold</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── LOG ── -->
+  <div class="sec">
+    <div class="sec-title">📋 Log Aktivitas</div>
+    <div class="log-wrap" id="logWrap">
+      <div class="log-entry"><span class="log-time">--:--</span><span class="log-info">Admin panel siap digunakan.</span></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="clearLog()" style="margin-top:10px">🗑 Hapus Log</button>
+  </div>
+
+</div>
+
+<script>
+const GH_API='https://api.github.com';
+const SCORE_FILES={10:'id/10.json',20:'id/20.json',30:'id/30.json',45:'id/45.json',50:'id/50.json',53:'id/53.json',60:'id/60.json'};
+const SOLD_FILE='sold.json';
+const NEW_FILE='new.json';
+
+let addScore=null,addList=[],soldList=[],foundMap={};
+
+/* ──────────────── STORAGE ──────────────── */
+function getToken(){return localStorage.getItem('gh_token')||''}
+function getRepo(){return document.getElementById('repoInput').value.trim()||localStorage.getItem('gh_repo')||'natas4ff/web-id'}
+function saveToken(){
+  const t=document.getElementById('tokenInput').value.trim();
+  const r=document.getElementById('repoInput').value.trim();
+  if(!t){toast('Token tidak boleh kosong','err');return}
+  localStorage.setItem('gh_token',t);
+  localStorage.setItem('gh_repo',r);
+  document.getElementById('tsDot').className='ts-dot ok';
+  document.getElementById('tsLabel').textContent='Token tersimpan (lokal)';
+  document.getElementById('tsLabel').style.color='var(--green)';
+  toast('Token disimpan di browser','ok');log('Token GitHub disimpan','ok');
+}
+function clearToken(){
+  localStorage.removeItem('gh_token');localStorage.removeItem('gh_repo');
+  document.getElementById('tokenInput').value='';
+  document.getElementById('tsDot').className='ts-dot err';
+  document.getElementById('tsLabel').textContent='Dihapus';
+  document.getElementById('tsLabel').style.color='var(--red)';
+  toast('Token dihapus','info');
+}
+function toggleToken(){
+  const i=document.getElementById('tokenInput');
+  i.type=i.type==='password'?'text':'password';
+}
+async function testToken(){
+  const t=getToken();
+  if(!t){toast('Simpan token dulu','err');return}
+  log('Menguji koneksi ke GitHub...','info');
+  try{
+    const r=await ghGet(`/repos/${getRepo()}`);
+    log(`✓ Terhubung ke repo: ${r.full_name}`,'ok');
+    toast('Koneksi berhasil!','ok');
+    document.getElementById('tsDot').className='ts-dot ok';
+  }catch(e){
+    log(`✗ Error: ${e.message}`,'err');toast('Koneksi gagal: '+e.message,'err');
+    document.getElementById('tsDot').className='ts-dot err';
+  }
+}
+/* ──────────────── GH API ──────────────── */
+async function ghGet(path){
+  const r=await fetch(GH_API+path,{headers:{Authorization:`Bearer ${getToken()}`,Accept:'application/vnd.github+json'}});
+  if(!r.ok)throw new Error(`HTTP ${r.status}`);
+  return r.json();
+}
+async function ghGetFile(path){
+  try{
+    const r=await fetch(`${GH_API}/repos/${getRepo()}/contents/${path}`,{headers:{Authorization:`Bearer ${getToken()}`,Accept:'application/vnd.github+json'}});
+    if(r.status===404)return{content:[],sha:null};
+    if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    const d=await r.json();
+    const text=atob(d.content.replace(/\n/g,''));
+    const lines=text.trim().split('\n').map(x=>x.trim()).filter(Boolean);
+    return{content:lines,sha:d.sha};
+  }catch{return{content:[],sha:null}}
+}
+async function ghPutFile(path,lines,sha,msg){
+  const content=btoa(lines.join('\n')+'\n');
+  const body={message:msg,content};
+  if(sha)body.sha=sha;
+  const r=await fetch(`${GH_API}/repos/${getRepo()}/contents/${path}`,{
+    method:'PUT',
+    headers:{Authorization:`Bearer ${getToken()}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+  if(!r.ok){const e=await r.json();throw new Error(e.message||`HTTP ${r.status}`)}
+  return r.json();
+}
+
+/* ──────────────── ADD IDs ──────────────── */
+function selScore(el,ctx){
+  if(ctx==='add'){
+    document.querySelectorAll('#addScorePills .score-pill').forEach(p=>p.classList.remove('sel'));
+    el.classList.add('sel');addScore=el.dataset.v;
+  }
+  checkAddBtn();
+}
+function parseAdd(){
+  const raw=document.getElementById('addInput').value;
+  const ids=[...new Set(raw.split(/[\n,\s]+/).map(x=>x.trim()).filter(x=>/^\d{10,15}$/.test(x)))];
+  addList=ids;
+  document.getElementById('addCount').textContent=ids.length?`(${ids.length} ID terdeteksi)`:'';
+  const prev=document.getElementById('addPreview');
+  prev.innerHTML=ids.map(id=>`<div class="id-chip">${id}<span class="chip-del" onclick="removeAdd('${id}')">×</span></div>`).join('');
+  checkAddBtn();
+}
+function removeAdd(id){addList=addList.filter(x=>x!==id);document.getElementById('addInput').value=addList.join('\n');parseAdd()}
+function checkAddBtn(){document.getElementById('btnAdd').disabled=!addList.length||!addScore}
+
+async function addIDs(){
+  if(!getToken()){toast('Token belum disimpan','err');return}
+  if(!addList.length||!addScore){toast('Pilih score dan masukkan ID','err');return}
+  const btn=document.getElementById('btnAdd');
+  btn.disabled=true;document.getElementById('addBtnText').innerHTML='<div class="sp-sm"></div> Memproses...';
+  log(`Menambah ${addList.length} ID ke score ${addScore}...`,'info');
+  try{
+    const file=SCORE_FILES[addScore];
+    const {content:cur,sha}=await ghGetFile(file);
+    const existing=new Set(cur);
+    const toAdd=addList.filter(id=>!existing.has(id));
+    const dupes=addList.filter(id=>existing.has(id));
+    if(dupes.length) log(`⚠ ${dupes.length} ID sudah ada (dilewati): ${dupes.slice(0,3).join(', ')}${dupes.length>3?'...':''}`,'info');
+    if(!toAdd.length){toast('Semua ID sudah ada di file','info');log('Tidak ada ID baru untuk ditambahkan','info');return}
+    const newContent=[...cur,...toAdd];
+    await ghPutFile(file,newContent,sha,`Add ${toAdd.length} IDs to score ${addScore}`);
+    // Add to new.json
+    const {content:newList,sha:newSha}=await ghGetFile(NEW_FILE);
+    const updNew=[...new Set([...newList,...toAdd])];
+    await ghPutFile(NEW_FILE,updNew,newSha,`Mark ${toAdd.length} IDs as new`);
+    log(`✓ Berhasil tambah ${toAdd.length} ID ke score ${addScore}`,'ok');
+    toast(`${toAdd.length} ID berhasil ditambahkan!`,'ok');
+    document.getElementById('addInput').value='';addList=[];parseAdd();
+  }catch(e){
+    log(`✗ Error: ${e.message}`,'err');toast('Gagal: '+e.message,'err');
+  }finally{
+    btn.disabled=false;document.getElementById('addBtnText').textContent='➕ Tambah ke GitHub';checkAddBtn();
+  }
+}
+
+/* ──────────────── SOLD IDs ──────────────── */
+function parseSold(){
+  const raw=document.getElementById('soldInput').value;
+  const ids=[...new Set(raw.split(/[\n,\s]+/).map(x=>x.trim()).filter(x=>/^\d{10,15}$/.test(x)))];
+  soldList=ids;
+  document.getElementById('soldCount').textContent=ids.length?`(${ids.length} ID)`:' ';
+  const prev=document.getElementById('soldPreview');
+  prev.innerHTML=ids.map(id=>`<div class="id-chip">${id}<span class="chip-del" onclick="removeSold('${id}')">×</span></div>`).join('');
+  document.getElementById('btnSold').disabled=!ids.length;
+  document.getElementById('sellResult').style.display='none';
+  foundMap={};
+}
+function removeSold(id){soldList=soldList.filter(x=>x!==id);document.getElementById('soldInput').value=soldList.join('\n');parseSold()}
+
+async function searchIDs(){
+  if(!soldList.length){toast('Masukkan ID dulu','err');return}
+  if(!getToken()){toast('Token belum disimpan','err');return}
+  const btn=document.getElementById('srchBtnText');
+  btn.innerHTML='<div class="sp-sm" style="display:inline-block;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;animation:spin .6s linear infinite"></div> Mencari...';
+  log(`Mencari ${soldList.length} ID di semua score...`,'info');
+  foundMap={};
+  try{
+    const allFiles=await Promise.all(Object.entries(SCORE_FILES).map(async([sc,path])=>{
+      const {content}=await ghGetFile(path);return{sc,content};
+    }));
+    soldList.forEach(id=>{
+      allFiles.forEach(({sc,content})=>{if(content.includes(id)){if(!foundMap[id])foundMap[id]=[];foundMap[id].push(sc)}});
+    });
+    const found=Object.keys(foundMap);
+    const notFound=soldList.filter(id=>!foundMap[id]);
+    const res=document.getElementById('sellResult');
+    res.style.display='block';
+    let html='';
+    if(found.length){
+      html+=`<div class="sr-found">✓ ${found.length} ID ditemukan:</div>`;
+      found.forEach(id=>html+=`<div class="sr-detail">${id} → Score ${foundMap[id].join(', ')}</div>`);
+    }
+    if(notFound.length){
+      html+=`<div class="sr-notfound" style="margin-top:8px">✗ ${notFound.length} ID tidak ditemukan di semua score:</div>`;
+      notFound.forEach(id=>html+=`<div class="sr-detail" style="color:var(--muted)">${id}</div>`);
+    }
+    res.innerHTML=html;
+    log(`Ditemukan ${found.length}/${soldList.length} ID. Tidak ditemukan: ${notFound.length}`,'ok');
+  }catch(e){log(`✗ Error: ${e.message}`,'err');toast('Gagal: '+e.message,'err')}
+  finally{btn.textContent='🔍 Cari di Semua Score'}
+}
+
+async function markSold(){
+  if(!soldList.length){toast('Masukkan ID dulu','err');return}
+  if(!getToken()){toast('Token belum disimpan','err');return}
+  const toMove=Object.keys(foundMap).length>0?Object.keys(foundMap):soldList;
+  const btn=document.getElementById('btnSold');
+  btn.disabled=true;document.getElementById('soldBtnText').innerHTML='<div class="sp-sm"></div> Memproses...';
+  log(`Memindahkan ${toMove.length} ID ke sold.json...`,'info');
+  try{
+    // 1. Add to sold.json
+    const {content:soldCur,sha:soldSha}=await ghGetFile(SOLD_FILE);
+    const newSold=[...new Set([...soldCur,...toMove])];
+    await ghPutFile(SOLD_FILE,newSold,soldSha,`Mark ${toMove.length} IDs as sold`);
+    log(`✓ ${toMove.length} ID ditambahkan ke sold.json`,'ok');
+
+    // 2. Remove from each score file
+    const grouped={};
+    if(Object.keys(foundMap).length>0){
+      toMove.forEach(id=>{(foundMap[id]||[]).forEach(sc=>{if(!grouped[sc])grouped[sc]=[];grouped[sc].push(id)})});
+    } else {
+      // search first
+      const allFiles=await Promise.all(Object.entries(SCORE_FILES).map(async([sc,path])=>{
+        const {content}=await ghGetFile(path);return{sc,path,content};
+      }));
+      toMove.forEach(id=>{
+        allFiles.forEach(({sc,content})=>{if(content.includes(id)){if(!grouped[sc])grouped[sc]=[];grouped[sc].push(id)}});
+      });
+    }
+    for(const [sc,ids] of Object.entries(grouped)){
+      const path=SCORE_FILES[sc];
+      const {content:cur,sha}=await ghGetFile(path);
+      const updated=cur.filter(x=>!ids.includes(x));
+      await ghPutFile(path,updated,sha,`Remove sold IDs from score ${sc}`);
+      log(`✓ Hapus ${ids.length} ID dari score ${sc}`,'ok');
+    }
+
+    // 3. Remove from new.json if present
+    const {content:newList,sha:newSha}=await ghGetFile(NEW_FILE);
+    const updNew=newList.filter(x=>!toMove.includes(x));
+    if(updNew.length!==newList.length){
+      await ghPutFile(NEW_FILE,updNew,newSha,'Remove sold IDs from new.json');
+      log(`✓ Hapus ${newList.length-updNew.length} ID dari new.json`,'ok');
+    }
+
+    toast(`${toMove.length} ID berhasil dipindahkan ke sold!`,'ok');
+    document.getElementById('soldInput').value='';soldList=[];parseSold();
+    foundMap={};
+    document.getElementById('sellResult').style.display='none';
+  }catch(e){
+    log(`✗ Error: ${e.message}`,'err');toast('Gagal: '+e.message,'err');
+  }finally{
+    btn.disabled=false;document.getElementById('soldBtnText').textContent='🔴 Pindahkan ke Sold';
+  }
+}
+
+/* ──────────────── LOG & TOAST ──────────────── */
+function log(msg,type='info'){
+  const wrap=document.getElementById('logWrap');
+  const now=new Date();const t=now.toTimeString().slice(0,8);
+  const cls=type==='ok'?'log-ok':type==='err'?'log-err':'log-info';
+  wrap.innerHTML+=`<div class="log-entry"><span class="log-time">${t}</span><span class="${cls}">${msg}</span></div>`;
+  wrap.scrollTop=wrap.scrollHeight;
+}
+function clearLog(){document.getElementById('logWrap').innerHTML='<div class="log-entry"><span class="log-time">--:--</span><span class="log-info">Log dibersihkan.</span></div>'}
+function toast(msg,type='info'){
+  const w=document.getElementById('toastWrap');
+  const d=document.createElement('div');d.className=`toast ${type}`;
+  const ico=type==='ok'?'✓':type==='err'?'✗':'ℹ';
+  d.innerHTML=`<span>${ico}</span><span>${msg}</span>`;
+  w.appendChild(d);setTimeout(()=>{d.style.opacity='0';d.style.transition='opacity .3s';setTimeout(()=>d.remove(),300)},3000);
+}
+
+/* ──────────────── INIT ──────────────── */
+function init(){
+  const t=getToken();const r=localStorage.getItem('gh_repo');
+  if(t){
+    document.getElementById('tokenInput').value=t;
+    document.getElementById('tsDot').className='ts-dot ok';
+    document.getElementById('tsLabel').textContent='Token tersimpan';
+    document.getElementById('tsLabel').style.color='var(--green)';
+  }
+  if(r)document.getElementById('repoInput').value=r;
+}
+init();
+</script>
+</body>
+</html>
