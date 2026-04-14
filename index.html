@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ID Store — Premium Number Shop</title>
+<title>ID Store — Premium ID Shop</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -71,13 +71,13 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 <body>
 <div class="orb o1"></div><div class="orb o2"></div>
 <nav>
-  <div class="nav-logo">ID·STORE</div>
+  <div class="nav-logo">IDglitxh</div>
   <a href="id.html" class="nav-cta">Lihat Semua ID →</a>
 </nav>
 <section class="hero">
   <div class="hero-pill"><div class="pulse"></div>Live Stok Tersedia</div>
-  <h1>Nomor<em>Premium</em>Terbaik</h1>
-  <p class="hero-sub">Temukan ID nomor eksklusif berbagai kategori score. Dari unik hingga premium — semua ada di sini.</p>
+  <h1>ID<em>Premium</em>Terbaik</h1>
+  <p class="hero-sub">Temukan ID eksklusif berbagai kategori score. Dari unik hingga premium — semua ada di sini.</p>
   <div class="stat-wrap">
     <div class="stat-grid">
       <div class="stat-box"><div class="stat-n" id="sTotal">—</div><div class="stat-l">Total ID</div></div>
@@ -93,9 +93,9 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
 </section>
 <div class="hline"></div>
 <section class="sec" id="scores">
-  <div class="sec-tag">Koleksi Nomor</div>
+  <div class="sec-tag">Koleksi ID</div>
   <h2 class="sec-title">Pilih Berdasarkan Score</h2>
-  <p class="sec-sub">Semakin tinggi score, semakin eksklusif nomor tersebut.</p>
+  <p class="sec-sub">Semakin tinggi score, semakin eksklusif ID tersebut.</p>
   <div class="score-grid" id="scoreGrid"></div>
 </section>
 <div class="hline"></div>
@@ -103,13 +103,13 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18
   <div class="sec-tag">Mengapa Kami</div>
   <h2 class="sec-title">Fitur Unggulan</h2>
   <div class="feat-grid">
-    <div class="feat"><div class="feat-icon">🔍</div><div class="feat-title">Smart Search</div><div class="feat-desc">Cari nomor dari semua kategori dalam hitungan detik.</div></div>
-    <div class="feat"><div class="feat-icon">⚡</div><div class="feat-title">Live Stock</div><div class="feat-desc">Data stok diperbarui langsung dari GitHub secara real-time.</div></div>
-    <div class="feat"><div class="feat-icon">🎯</div><div class="feat-title">Deteksi Duplikat</div><div class="feat-desc">Nomor yang muncul di beberapa score otomatis ditandai.</div></div>
+    <div class="feat"><div class="feat-icon">🔍</div><div class="feat-title">Smart Search</div><div class="feat-desc">Cari ID dari semua kategori dalam hitungan detik.</div></div>
+    <div class="feat"><div class="feat-icon">⚡</div><div class="feat-title">Live Stock</div><div class="feat-desc">Data stok diperbarui langsung dari Server secara real-time.</div></div>
+    <div class="feat"><div class="feat-icon">🎯</div><div class="feat-title">Deteksi Duplikat</div><div class="feat-desc">ID yang muncul di beberapa score otomatis ditandai.</div></div>
     <div class="feat"><div class="feat-icon">💬</div><div class="feat-title">Order via WhatsApp</div><div class="feat-desc">Pembelian mudah langsung lewat WhatsApp, harga transparan.</div></div>
   </div>
 </section>
-<footer><span class="fl">ID·STORE</span><span>© 2025 · Semua hak dilindungi</span></footer>
+<footer><span class="fl">IDglitxh</span><span>© 2026 • GLITXH</span></footer>
 <script>
 const SOURCES=[
   {score:'10',url:'https://raw.githubusercontent.com/natas4ff/web-id/main/id/10.json',color:'#f59e0b',tier:'tier-c',tl:'C — STANDARD'},
@@ -123,7 +123,7 @@ const SOURCES=[
 async function ft(u){try{const r=await fetch(u+'?_='+Date.now());const t=await r.text();return t.trim().split('\n').map(x=>x.trim()).filter(Boolean)}catch{return[]}}
 async function init(){
   const res=await Promise.all(SOURCES.map(s=>ft(s.url)));
-  let sold=[];try{sold=await ft('https://raw.githubusercontent.com/natas4ff/web-id/main/sold.json')}catch{}
+  let sold=[];try{sold=await ft('https://raw.githubusercontent.com/natas4ff/web-id/main/id/sold.json')}catch{}
   const all=res.flat();
   const freq={};all.forEach(n=>freq[n]=(freq[n]||0)+1);
   document.getElementById('sTotal').textContent=all.length.toLocaleString('id-ID');
@@ -134,7 +134,7 @@ async function init(){
     const a=document.createElement('a');a.href=`id.html?score=${src.score}`;a.className='sc-card';
     a.innerHTML=`<div class="sc-top"><span class="sc-tier ${src.tier}">${src.tl}</span><span class="sc-num" style="color:${src.color}">${src.score}</span></div>
     <div class="sc-name">Score ${src.score} Collection</div>
-    <div class="sc-cnt">Tersedia: <b>${res[i].length.toLocaleString('id-ID')} nomor</b></div>
+    <div class="sc-cnt">Tersedia: <b>${res[i].length.toLocaleString('id-ID')} ID</b></div>
     <div class="sc-arrow">Lihat koleksi →</div>`;
     g.appendChild(a);
   });
@@ -143,4 +143,3 @@ init();
 </script>
 </body>
 </html>
-
