@@ -1,1 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>ID Store — Premium Number Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080f;--card:#111320;--border:#1f2340;--border2:#252a4a;
+  --cyan:#00d4ff;--purple:#8b5cf6;--pink:#f43f76;--gold:#f59e0b;
+  --text:#eef0ff;--muted:#636892;--font:'Plus Jakarta Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px)}
+.o1{width:500px;height:500px;background:radial-gradient(circle,rgba(0,212,255,.12),transparent 70%);top:-150px;left:-100px}
+.o2{width:450px;height:450px;background:radial-gradient(circle,rgba(139,92,246,.1),transparent 70%);bottom:-100px;right:-120px}
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;background:rgba(7,8,15,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-size:1.05rem;font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-cta{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff;font-size:.75rem;font-weight:800;padding:.4rem 1rem;border-radius:99px;text-decoration:none;white-space:nowrap}
+.hero{position:relative;z-index:1;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:72px 20px 40px;text-align:center;gap:0}
+.hero-pill{display:inline-flex;align-items:center;gap:6px;background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2);color:var(--cyan);padding:.32rem .85rem;border-radius:99px;font-size:.65rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:20px;animation:fu .5s ease both}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:p 1.5s infinite;flex-shrink:0}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.25}}
+.hero h1{font-size:clamp(2.6rem,12vw,5.5rem);font-weight:900;line-height:.92;letter-spacing:-2px;animation:fu .6s .08s ease both}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--cyan),var(--purple) 50%,var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+.hero-sub{margin-top:14px;font-size:.88rem;color:var(--muted);line-height:1.65;max-width:320px;animation:fu .6s .15s ease both}
+.stat-wrap{width:100%;max-width:420px;margin-top:28px;animation:fu .6s .22s ease both}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);border-radius:18px;overflow:hidden}
+.stat-box{background:var(--card);padding:16px 8px;text-align:center}
+.stat-n{font-size:1.7rem;font-weight:800;font-family:var(--mono);background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1}
+.stat-l{font-size:.6rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;font-weight:700}
+.hero-btns{display:flex;gap:10px;margin-top:24px;animation:fu .6s .3s ease both;justify-content:center;flex-wrap:wrap}
+.btn-p{background:linear-gradient(135deg,var(--cyan),var(--purple));color:#fff;font-weight:800;font-size:.85rem;padding:.7rem 1.8rem;border-radius:99px;text-decoration:none;box-shadow:0 0 24px rgba(0,212,255,.2);transition:transform .2s,box-shadow .2s}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(0,212,255,.35)}
+.btn-s{background:transparent;color:var(--text);font-weight:700;font-size:.85rem;padding:.7rem 1.4rem;border-radius:99px;text-decoration:none;border:1px solid var(--border2);transition:border-color .2s}
+.btn-s:hover{border-color:var(--cyan)}
+.sec{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:52px 20px}
+.sec-tag{font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);font-weight:800;margin-bottom:8px}
+.sec-title{font-size:clamp(1.4rem,5vw,2.2rem);font-weight:900;letter-spacing:-1px;margin-bottom:6px}
+.sec-sub{color:var(--muted);font-size:.83rem;line-height:1.6;max-width:350px}
+.hline{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0 20px}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;margin-top:24px}
+.sc-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;text-decoration:none;color:var(--text);display:block;transition:transform .2s,border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
+.sc-card:hover{transform:translateY(-3px);border-color:rgba(0,212,255,.3);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.sc-tier{font-size:.58rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:.22rem .6rem;border-radius:99px;border:1px solid}
+.sc-num{font-size:2.2rem;font-weight:900;font-family:var(--mono);letter-spacing:-2px;line-height:1}
+.sc-name{font-size:.83rem;font-weight:800;margin-bottom:4px}
+.sc-cnt{font-size:.75rem;color:var(--muted);font-family:var(--mono)}
+.sc-cnt b{color:var(--text);font-weight:700}
+.sc-arrow{font-size:.75rem;color:var(--muted);margin-top:12px;font-weight:700;transition:color .2s}
+.sc-card:hover .sc-arrow{color:var(--cyan)}
+.tier-s{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.25);color:var(--cyan)}
+.tier-a{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.25);color:var(--purple)}
+.tier-b{background:rgba(244,63,118,.08);border-color:rgba(244,63,118,.25);color:var(--pink)}
+.tier-c{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25);color:var(--gold)}
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:24px}
+.feat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+.feat-icon{font-size:1.3rem;margin-bottom:10px}
+.feat-title{font-size:.83rem;font-weight:800;margin-bottom:4px}
+.feat-desc{font-size:.75rem;color:var(--muted);line-height:1.6}
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:18px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:.72rem;color:var(--muted)}
+.fl{font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+@keyframes fu{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div>
+<nav>
+  <div class="nav-logo">ID·STORE</div>
+  <a href="id.html" class="nav-cta">Lihat Semua ID →</a>
+</nav>
+<section class="hero">
+  <div class="hero-pill"><div class="pulse"></div>Live Stok Tersedia</div>
+  <h1>Nomor<em>Premium</em>Terbaik</h1>
+  <p class="hero-sub">Temukan ID nomor eksklusif berbagai kategori score. Dari unik hingga premium — semua ada di sini.</p>
+  <div class="stat-wrap">
+    <div class="stat-grid">
+      <div class="stat-box"><div class="stat-n" id="sTotal">—</div><div class="stat-l">Total ID</div></div>
+      <div class="stat-box"><div class="stat-n">7</div><div class="stat-l">Kategori</div></div>
+      <div class="stat-box"><div class="stat-n" id="sDup">—</div><div class="stat-l">Duplikat</div></div>
+      <div class="stat-box"><div class="stat-n" id="sSold">—</div><div class="stat-l">Terjual</div></div>
+    </div>
+  </div>
+  <div class="hero-btns">
+    <a href="id.html" class="btn-p">Jelajahi Semua ID →</a>
+    <a href="#scores" class="btn-s">Lihat Kategori</a>
+  </div>
+</section>
+<div class="hline"></div>
+<section class="sec" id="scores">
+  <div class="sec-tag">Koleksi Nomor</div>
+  <h2 class="sec-title">Pilih Berdasarkan Score</h2>
+  <p class="sec-sub">Semakin tinggi score, semakin eksklusif nomor tersebut.</p>
+  <div class="score-grid" id="scoreGrid"></div>
+</section>
+<div class="hline"></div>
+<section class="sec">
+  <div class="sec-tag">Mengapa Kami</div>
+  <h2 class="sec-title">Fitur Unggulan</h2>
+  <div class="feat-grid">
+    <div class="feat"><div class="feat-icon">🔍</div><div class="feat-title">Smart Search</div><div class="feat-desc">Cari nomor dari semua kategori dalam hitungan detik.</div></div>
+    <div class="feat"><div class="feat-icon">⚡</div><div class="feat-title">Live Stock</div><div class="feat-desc">Data stok diperbarui langsung dari GitHub secara real-time.</div></div>
+    <div class="feat"><div class="feat-icon">🎯</div><div class="feat-title">Deteksi Duplikat</div><div class="feat-desc">Nomor yang muncul di beberapa score otomatis ditandai.</div></div>
+    <div class="feat"><div class="feat-icon">💬</div><div class="feat-title">Order via WhatsApp</div><div class="feat-desc">Pembelian mudah langsung lewat WhatsApp, harga transparan.</div></div>
+  </div>
+</section>
+<footer><span class="fl">ID·STORE</span><span>© 2025 · Semua hak dilindungi</span></footer>
+<script>
+const SOURCES=[
+  {score:'10',url:'https://raw.githubusercontent.com/natas4ff/web-id/main/id/10.json',color:'#f59e0b',tier:'tier-c',tl:'C — STANDARD'},
+  {score:'20',url:'https://raw.githubusercontent.com/natas4ff/web-id/main/id/20.json',color:'#f59e0b',tier:'tier-c',tl:'C — STANDARD'},
+  {score:'30',url:'https://raw.githubusercontent.com/natas4ff/web-id/main/id/30.json',color:'#f43f76',tier:'tier-b',tl:'B — RARE'},
+  {score:'45',url:'https://raw.githubusercontent.com/natas4ff/web-id/main/id/45.json',color:'#8b5cf6',tier:'tier-a',tl:'A — PREMIUM'},
+  {score:'50',url:'https://raw.githubusercontent.com/natas4ff/web-id/main/id/50.json',color:'#8b5cf6',tier:'tier-a',tl:'A — PREMIUM'},
+  {score:'53',url:'https://raw.githubusercontent.com/natas4ff/web-id/main/id/53.json',color:'#00d4ff',tier:'tier-s',tl:'S — ULTRA'},
+  {score:'60',url:'https://raw.githubusercontent.com/natas4ff/web-id/main/id/60.json',color:'#00d4ff',tier:'tier-s',tl:'S — ULTRA'},
+];
+async function ft(u){try{const r=await fetch(u+'?_='+Date.now());const t=await r.text();return t.trim().split('\n').map(x=>x.trim()).filter(Boolean)}catch{return[]}}
+async function init(){
+  const res=await Promise.all(SOURCES.map(s=>ft(s.url)));
+  let sold=[];try{sold=await ft('https://raw.githubusercontent.com/natas4ff/web-id/main/sold.json')}catch{}
+  const all=res.flat();
+  const freq={};all.forEach(n=>freq[n]=(freq[n]||0)+1);
+  document.getElementById('sTotal').textContent=all.length.toLocaleString('id-ID');
+  document.getElementById('sDup').textContent=Object.values(freq).filter(v=>v>1).length.toLocaleString('id-ID');
+  document.getElementById('sSold').textContent=sold.length.toLocaleString('id-ID');
+  const g=document.getElementById('scoreGrid');
+  SOURCES.forEach((src,i)=>{
+    const a=document.createElement('a');a.href=`id.html?score=${src.score}`;a.className='sc-card';
+    a.innerHTML=`<div class="sc-top"><span class="sc-tier ${src.tier}">${src.tl}</span><span class="sc-num" style="color:${src.color}">${src.score}</span></div>
+    <div class="sc-name">Score ${src.score} Collection</div>
+    <div class="sc-cnt">Tersedia: <b>${res[i].length.toLocaleString('id-ID')} nomor</b></div>
+    <div class="sc-arrow">Lihat koleksi →</div>`;
+    g.appendChild(a);
+  });
+}
+init();
+</script>
+</body>
+</html>
 
