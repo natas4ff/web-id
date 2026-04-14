@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Pembayaran — ID Store</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07080f;--card:#111320;--card2:#161929;--border:#1f2340;--border2:#252a4a;
+  --cyan:#00d4ff;--purple:#8b5cf6;--pink:#f43f76;--gold:#f59e0b;--green:#10b981;
+  --text:#eef0ff;--muted:#636892;--font:'Plus Jakarta Sans',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(90px)}
+.o1{width:400px;height:400px;background:radial-gradient(circle,rgba(0,212,255,.1),transparent 70%);top:-100px;right:-80px}
+.o2{width:350px;height:350px;background:radial-gradient(circle,rgba(139,92,246,.08),transparent 70%);bottom:0;left:-80px}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;padding:0 16px;display:flex;align-items:center;gap:12px;background:rgba(7,8,15,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-back{color:var(--muted);text-decoration:none;font-size:.8rem;font-weight:700;display:flex;align-items:center;gap:4px;transition:color .2s}
+.nav-back:hover{color:var(--text)}
+.nav-logo{font-size:.95rem;font-weight:900;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* WRAP */
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:72px 16px 60px}
+
+/* STEP HEADER */
+.step-head{margin-bottom:20px}
+.step-tag{font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);font-weight:800;margin-bottom:6px}
+.step-title{font-size:1.5rem;font-weight:900;letter-spacing:-1px}
+
+/* ID CARD */
+.id-showcase{background:var(--card);border:1px solid var(--border2);border-radius:18px;padding:18px;margin-bottom:14px;position:relative;overflow:hidden}
+.id-showcase::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--purple))}
+.id-show-label{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:8px}
+.id-show-num{font-family:var(--mono);font-size:1.6rem;font-weight:700;letter-spacing:1px;word-break:break-all;background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.id-score-row{display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap}
+.id-score-badge{font-size:.65rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:.25rem .7rem;border-radius:99px;border:1px solid}
+
+/* INFO ROWS */
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:14px;overflow:hidden}
+.info-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.info-row:last-child{border-bottom:none}
+.ir-left{display:flex;align-items:center;gap:10px}
+.ir-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.ir-label{font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.ir-value{font-size:.88rem;font-weight:800}
+.ir-right{display:flex;align-items:center;gap:6px}
+/* Google Icon SVG */
+.g-icon{width:20px;height:20px}
+
+/* PRICE CARD */
+.price-card{background:var(--card);border:1px solid var(--border2);border-radius:16px;padding:16px;margin-bottom:14px}
+.price-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0}
+.price-row:not(:last-child){border-bottom:1px solid var(--border)}
+.price-label{font-size:.78rem;color:var(--muted);font-weight:700}
+.price-val{font-size:.9rem;font-weight:800;font-family:var(--mono)}
+.price-total-row{display:flex;justify-content:space-between;align-items:center;padding-top:10px;margin-top:4px}
+.price-total-label{font-size:.85rem;font-weight:800}
+.price-total-val{font-size:1.3rem;font-weight:900;font-family:var(--mono);background:linear-gradient(135deg,var(--cyan),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* GOOGLE SECTION */
+.google-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:14px}
+.gs-title{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px;color:var(--muted)}
+.gs-note{font-size:.72rem;color:var(--muted);margin-top:10px;line-height:1.5;padding:8px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:8px}
+
+/* CHECKBOX OPTIONS */
+.cb-option{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:12px;border:1px solid var(--border2);cursor:pointer;transition:border-color .2s,background .2s;margin-bottom:8px;-webkit-tap-highlight-color:transparent}
+.cb-option:last-child{margin-bottom:0}
+.cb-option:hover{border-color:var(--cyan);background:rgba(0,212,255,.04)}
+.cb-option.selected{border-color:var(--cyan);background:rgba(0,212,255,.06)}
+.cb-option.selected-admin{border-color:var(--gold);background:rgba(245,158,11,.06)}
+.cb-box{width:20px;height:20px;border-radius:6px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all .15s}
+.cb-option.selected .cb-box{border-color:var(--cyan);background:var(--cyan)}
+.cb-option.selected-admin .cb-box{border-color:var(--gold);background:var(--gold)}
+.cb-check{color:#000;font-size:.7rem;font-weight:900;display:none}
+.cb-option.selected .cb-check,.cb-option.selected-admin .cb-check{display:block}
+.cb-body{}
+.cb-label{font-size:.85rem;font-weight:800;margin-bottom:2px}
+.cb-desc{font-size:.72rem;color:var(--muted);line-height:1.5}
+.cb-admin-tag{display:inline-block;background:rgba(245,158,11,.12);color:var(--gold);border:1px solid rgba(245,158,11,.25);font-size:.55rem;font-weight:800;letter-spacing:1.5px;padding:.15rem .45rem;border-radius:99px;margin-left:6px;text-transform:uppercase;vertical-align:middle}
+
+/* ERROR */
+.err-msg{background:rgba(244,63,118,.08);border:1px solid rgba(244,63,118,.25);color:var(--pink);font-size:.75rem;font-weight:700;padding:10px 12px;border-radius:10px;margin-bottom:14px;display:none;align-items:center;gap:8px}
+.err-msg.show{display:flex}
+
+/* WA BUTTON */
+.wa-btn{width:100%;padding:16px;border-radius:14px;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;font-size:.95rem;font-weight:900;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .2s,box-shadow .2s;box-shadow:0 0 24px rgba(37,211,102,.2);letter-spacing:.3px;font-family:var(--font)}
+.wa-btn:hover{transform:translateY(-2px);box-shadow:0 0 40px rgba(37,211,102,.35)}
+.wa-btn:active{transform:translateY(0)}
+.wa-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.wa-icon{width:22px;height:22px;flex-shrink:0}
+
+/* LOADING */
+.ld{display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 20px;text-align:center}
+.spinner{width:32px;height:32px;border-radius:50%;border:3px solid var(--border2);border-top-color:var(--cyan);animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ld-t{font-size:.78rem;color:var(--muted)}
+
+/* BACK LINK */
+.back-link{text-align:center;margin-top:16px}
+.back-link a{color:var(--muted);font-size:.75rem;font-weight:700;text-decoration:none;transition:color .2s}
+.back-link a:hover{color:var(--text)}
+
+/* tier colors */
+.tier-s{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.25);color:var(--cyan)}
+.tier-a{background:rgba(139,92,246,.08);border-color:rgba(139,92,246,.25);color:var(--purple)}
+.tier-b{background:rgba(244,63,118,.08);border-color:rgba(244,63,118,.25);color:var(--pink)}
+.tier-c{background:rgba(245,158,11,.08);border-color:rgba(245,158,11,.25);color:var(--gold)}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div>
+
+<nav>
+  <a href="javascript:history.back()" class="nav-back">← Kembali</a>
+  <div class="nav-logo">ID·STORE</div>
+</nav>
+
+<div class="wrap">
+  <div id="loading" class="ld">
+    <div class="spinner"></div>
+    <div class="ld-t">Memuat detail...</div>
+  </div>
+  <div id="content" style="display:none">
+    <div class="step-head">
+      <div class="step-tag">Pembelian ID</div>
+      <h1 class="step-title">Detail Pesanan</h1>
+    </div>
+
+    <!-- ID SHOWCASE -->
+    <div class="id-showcase">
+      <div class="id-show-label">Nomor ID</div>
+      <div class="id-show-num" id="showNum">—</div>
+      <div class="id-score-row">
+        <span class="id-score-badge" id="scoreBadge">—</span>
+        <span class="id-score-badge" id="tierBadge">—</span>
+      </div>
+    </div>
+
+    <!-- INFO -->
+    <div class="info-card">
+      <div class="info-row">
+        <div class="ir-left">
+          <div class="ir-icon" style="background:rgba(0,212,255,.08)">🌏</div>
+          <div>
+            <div class="ir-label">Region</div>
+            <div class="ir-value">Indonesia</div>
+          </div>
+        </div>
+        <div class="ir-right">
+          <span style="font-size:.7rem;color:var(--muted);font-weight:700">🇮🇩</span>
+        </div>
+      </div>
+      <div class="info-row">
+        <div class="ir-left">
+          <div class="ir-icon" style="background:rgba(66,133,244,.08)">
+            <svg class="g-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></svg>
+          </div>
+          <div>
+            <div class="ir-label">Metode Login</div>
+            <div class="ir-value">Google Account</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRICE -->
+    <div class="price-card">
+      <div class="price-row">
+        <span class="price-label">Harga ID</span>
+        <span class="price-val" id="basePrice">—</span>
+      </div>
+      <div class="price-row" id="adminFeeRow" style="display:none">
+        <span class="price-label">Google dari Admin <span style="font-size:.65rem;color:var(--gold)">+Rp500</span></span>
+        <span class="price-val" style="color:var(--gold)">+ Rp500</span>
+      </div>
+      <div class="price-total-row">
+        <span class="price-total-label">Total Bayar</span>
+        <span class="price-total-val" id="totalPrice">—</span>
+      </div>
+    </div>
+
+    <!-- GOOGLE OPTION -->
+    <div class="google-section">
+      <div class="gs-title">Pilih Sumber Google Account</div>
+
+      <div class="cb-option" id="cbSelf" onclick="toggleCb('self')">
+        <div class="cb-box"><div class="cb-check">✓</div></div>
+        <div class="cb-body">
+          <div class="cb-label">
+            <svg width="14" height="14" viewBox="0 0 48 48" style="vertical-align:middle;margin-right:4px" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Google dari Saya Sendiri
+          </div>
+          <div class="cb-desc">Gunakan akun Google milik sendiri untuk login. Gratis, tidak ada biaya tambahan.</div>
+        </div>
+      </div>
+
+      <div class="cb-option" id="cbAdmin" onclick="toggleCb('admin')">
+        <div class="cb-box"><div class="cb-check">✓</div></div>
+        <div class="cb-body">
+          <div class="cb-label">
+            <svg width="14" height="14" viewBox="0 0 48 48" style="vertical-align:middle;margin-right:4px" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Google dari Admin
+            <span class="cb-admin-tag">+Rp500</span>
+          </div>
+          <div class="cb-desc">Admin yang menyediakan akun Google. Dikenakan biaya tambahan Rp500.</div>
+        </div>
+      </div>
+
+      <div class="gs-note">⚠️ Wajib pilih salah satu opsi Google untuk melanjutkan pembelian.</div>
+    </div>
+
+    <!-- ERROR -->
+    <div class="err-msg" id="errMsg">
+      <span>⚠</span>
+      <span>Pilih opsi Google Account terlebih dahulu sebelum melanjutkan.</span>
+    </div>
+
+    <!-- WA BUTTON -->
+    <button class="wa-btn" id="waBtn" onclick="orderWA()">
+      <svg class="wa-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <path fill="#fff" d="M16 1C7.7 1 1 7.7 1 16c0 2.8.7 5.4 2.1 7.7L1 31l7.5-2c2.2 1.2 4.7 1.9 7.5 1.9C24.3 30.9 31 24.3 31 16S24.3 1 16 1zm0 27.3c-2.5 0-4.9-.7-7-1.9l-.5-.3-4.4 1.2 1.2-4.3-.3-.5C3.7 21 3 18.6 3 16 3 8.8 8.8 3 16 3s13 5.8 13 13-5.8 13.3-13 13.3zm7.1-9.8c-.4-.2-2.3-1.1-2.6-1.2-.3-.1-.6-.2-.8.2-.3.4-1 1.2-1.2 1.5-.2.3-.4.3-.8.1-.4-.2-1.7-.6-3.2-2-1.2-1.1-2-2.4-2.2-2.8-.2-.4 0-.6.2-.8l.5-.6.3-.5v-.5l-1.1-2.7c-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4-.3.4-1.2 1.2-1.2 2.9s1.2 3.3 1.4 3.6c.2.2 2.4 3.6 5.7 5.1 3.3 1.4 3.3.9 3.9.9.6 0 1.9-.8 2.2-1.5.3-.7.3-1.3.2-1.5-.1-.1-.3-.2-.7-.4z"/>
+      </svg>
+      Pesan via WhatsApp
+    </button>
+
+    <div class="back-link"><a href="javascript:history.back()">← Kembali ke daftar ID</a></div>
+  </div>
+</div>
+
+<script>
+const PRICE={10:3000,20:3000,30:5000,45:5000,50:5000,53:8000,60:8000};
+const TIER={10:{t:'tier-c',l:'TIER C'},20:{t:'tier-c',l:'TIER C'},30:{t:'tier-b',l:'TIER B'},45:{t:'tier-a',l:'TIER A'},50:{t:'tier-a',l:'TIER A'},53:{t:'tier-s',l:'TIER S'},60:{t:'tier-s',l:'TIER S'}};
+const WA_NUMBER='46760749829';
+let baseP=0,total=0,googleChoice=null,idNum='',scoreNum='';
+
+function fmt(n){return'Rp'+n.toLocaleString('id-ID')}
+
+function toggleCb(type){
+  if(googleChoice===type){
+    // deselect
+    googleChoice=null;
+    document.getElementById('cbSelf').classList.remove('selected');
+    document.getElementById('cbAdmin').classList.remove('selected-admin');
+  } else {
+    googleChoice=type;
+    document.getElementById('cbSelf').classList.toggle('selected',type==='self');
+    document.getElementById('cbAdmin').classList.toggle('selected-admin',type==='admin');
+    document.getElementById('cbSelf').classList.toggle('selected',type==='self');
+    // reset other
+    if(type==='self'){
+      document.getElementById('cbSelf').classList.add('selected');
+      document.getElementById('cbAdmin').classList.remove('selected-admin');
+    } else {
+      document.getElementById('cbAdmin').classList.add('selected-admin');
+      document.getElementById('cbSelf').classList.remove('selected');
+    }
+  }
+  updatePrice();
+  document.getElementById('errMsg').classList.remove('show');
+}
+
+function updatePrice(){
+  const add=googleChoice==='admin'?500:0;
+  total=baseP+add;
+  document.getElementById('adminFeeRow').style.display=googleChoice==='admin'?'flex':'none';
+  document.getElementById('totalPrice').textContent=fmt(total);
+}
+
+function orderWA(){
+  if(!googleChoice){
+    document.getElementById('errMsg').classList.add('show');
+    document.getElementById('errMsg').scrollIntoView({behavior:'smooth',block:'nearest'});
+    return;
+  }
+  const googleType=googleChoice==='admin'?'Google dari Admin (+Rp500)':'Google dari Saya Sendiri';
+  const msg=`Hallo, saya ingin membeli ID : ${idNum}, Score ${scoreNum}, dengan harga ${fmt(total)} (${googleType})`;
+  const url=`https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+}
+
+function init(){
+  const p=new URLSearchParams(location.search);
+  idNum=p.get('id')||'';
+  scoreNum=p.get('score')||'';
+  if(!idNum||!scoreNum){document.getElementById('loading').innerHTML='<div style="text-align:center;padding:40px;color:var(--muted)">ID tidak ditemukan. <a href="id.html" style="color:var(--cyan)">Kembali</a></div>';return}
+  baseP=PRICE[+scoreNum]||0;
+  total=baseP;
+  const tier=TIER[+scoreNum]||{t:'tier-c',l:'TIER C'};
+  document.getElementById('showNum').textContent=idNum;
+  const sb=document.getElementById('scoreBadge');
+  sb.textContent=`SCORE ${scoreNum}`;sb.className=`id-score-badge ${tier.t}`;
+  const tb=document.getElementById('tierBadge');
+  tb.textContent=tier.l;tb.className=`id-score-badge ${tier.t}`;
+  document.getElementById('basePrice').textContent=fmt(baseP);
+  document.getElementById('totalPrice').textContent=fmt(total);
+  document.getElementById('loading').style.display='none';
+  document.getElementById('content').style.display='block';
+  document.title=`Beli ID ${idNum} — ID Store`;
+}
+init();
+</script>
+</body>
+</html>
