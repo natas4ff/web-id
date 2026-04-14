@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Katalog ID — ID Store</title>
+<title>Katalog ID — IDglitxh</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -114,10 +114,10 @@ mark{background:rgba(0,212,255,.2);color:var(--cyan);border-radius:2px;padding:0
 <div class="orb o1"></div><div class="orb o2"></div>
 <nav>
   <a href="index.html" class="nav-back">← Back</a>
-  <div class="nav-logo">ID·STORE</div>
+  <div class="nav-logo">IDglitxh</div>
   <div class="search-wrap">
     <span class="si">⌕</span>
-    <input type="text" id="gSearch" placeholder="Cari nomor..." autocomplete="off"/>
+    <input type="text" id="gSearch" placeholder="Cari ID..." autocomplete="off"/>
   </div>
 </nav>
 <div class="ph">
@@ -174,7 +174,7 @@ async function init(){
   sold.forEach(n=>soldSet.add(n));newIds.forEach(n=>newSet.add(n));
   // header
   const total=Object.values(allData).flat().length;
-  document.getElementById('phSub').textContent=`${total.toLocaleString('id-ID')} nomor total · ${Object.keys(dupMap).length} duplikat · ${soldSet.size} terjual`;
+  document.getElementById('phSub').textContent=`${total.toLocaleString('id-ID')} ID total · ${Object.keys(dupMap).length} duplikat · ${soldSet.size} terjual`;
   // check url param
   const p=new URLSearchParams(location.search);
   const sc=p.get('score');if(sc)setF(sc);else render();
@@ -229,7 +229,7 @@ function render(){
   const filtered=getFiltered();
   const main=document.getElementById('main');
   let total=0;Object.values(filtered).forEach(a=>total+=a.length);
-  document.getElementById('ri').innerHTML=`Menampilkan <span>${total.toLocaleString('id-ID')}</span> nomor`;
+  document.getElementById('ri').innerHTML=`Menampilkan <span>${total.toLocaleString('id-ID')}</span> ID`;
   if(total===0){main.innerHTML=`<div class="empty"><div class="empty-ico">🔍</div><div class="empty-t">Tidak ada hasil</div><div class="empty-s">Coba ubah filter atau kata kunci.</div></div>`;return}
   main.innerHTML='';
   Object.keys(filtered).sort((a,b)=>+a-+b).forEach(sc=>{
